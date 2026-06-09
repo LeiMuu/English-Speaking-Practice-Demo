@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Speaking Practice</title>
+
+<style>
+  :root {
+    --bg: #0b1220;
+    --card: #111827;
+    --primary: #60a5fa;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --success: #34d399;
+    --border: rgba(255,255,255,0.08);
+  }
+
+  body {
+    margin: 0;
+    font-family: system-ui;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .app {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 20px;
+    text-align: center;
+    margin: 12px 0 18px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+  }
+
+  .label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .text {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .score {
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--success);
+    text-align: center;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    margin: 14px 0 18px;
+  }
+
+  button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #1f2937;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  button:active {
+    transform: scale(0.98);
+  }
+
+  .primary {
+    background: var(--primary);
+    color: #0b1220;
+  }
+
+  .hint {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: -6px;
+    margin-bottom: 10px;
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <h1>🎤 Speaking Practice</h1>
+
+  <div class="btn-group">
+    <button class="primary" onclick="startSpeak()">🎙 Speak</button>
+    <button onclick="nextQuestion()">➡ Next</button>
+  </div>
+
+  <div class="hint">Tap Speak and read aloud</div>
+
+  <div class="card">
+    <div class="label">QUESTION</div>
+    <div id="question" class="text">-</div>
+  </div>
+
+  <div class="card">
+    <div class="label">YOUR ANSWER</div>
+    <div id="userText" class="text">-</div>
+  </div>
+
+  <div class="card">
+    <div class="label">REFERENCE</div>
+    <div id="standardText" class="text">-</div>
+  </div>
+
+  <div class="card">
+    <div class="label">SCORE</div>
+    <div id="score" class="score">-</div>
+  </div>
+
+</div>
+
+<script>
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = new SpeechRecognition();
+recognition.lang = "en-US";
+recognition.interimResults = false;
+
+// 🎯 題庫（簡化但夠 Demo）
+const questions = [
+  { q: "Introduce yourself", a: "My name is John. I am a software engineer." },
+  { q: "Order coffee", a: "I would like a cup of coffee please." },
+  { q: "Ask direction", a: "How can I get to the MRT station?" },
+  { q: "Daily routine", a: "I usually wake up at seven." },
+  { q: "Talk hobby", a: "I enjoy reading books." },
+  { q: "Weather today", a: "It is sunny today." },
+  { q: "Say thanks", a: "Thank you very much." },
+  { q: "Say goodbye", a: "Goodbye and see you later." }
+];
+
+let current = null;
+
+function nextQuestion() {
+  current = questions[Math.floor(Math.random() * questions.length)];
+
+  document.getElementById("question").innerText = current.q;
+  document.getElementById("standardText").innerText = current.a;
+
+  document.getElementById("userText").innerText = "-";
+  document.getElementById("score").innerText = "-";
+}
+
+function startSpeak() {
+  if (!current) nextQuestion();
+  recognition.start();
+}
+
+recognition.onresult = (e) => {
+  const text = e.results[0][0].transcript;
+  document.getElementById("userText").innerText = text;
+
+  const score = calcScore(text, current.a);
+  document.getElementById("score").innerText = score + " / 100";
+};
+
+function calcScore(user, standard) {
+  const u = user.toLowerCase().split(" ");
+  const s = standard.toLowerCase().split(" ");
+  let match = 0;
+
+  s.forEach(w => {
+    if (u.includes(w)) match++;
+  });
+
+  return Math.round((match / s.length) * 100);
+}
+
+nextQuestion();
+</script>
+
+</body>
+</html>
