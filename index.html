@@ -1,357 +1,674 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AI Speaking School Engine v4</title>
 
 <style>
-body{margin:0;font-family:system-ui;background:#0b1220;color:#e5e7eb}
-.app{max-width:520px;margin:auto;padding:16px}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-h1{text-align:center;font-size:18px}
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#0b1220;
+  color:#e5e7eb;
+}
 
+/* 容器 */
+.wrap{
+  max-width:520px;
+  margin:0 auto;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* 卡片（還原你原本風格） */
 .card{
   background:#111827;
   padding:12px;
   border-radius:12px;
-  margin-bottom:10px;
   border:1px solid rgba(255,255,255,.08);
 }
 
-.label{font-size:11px;color:#94a3b8;margin-bottom:6px}
-
-.btns{display:flex;gap:8px;margin-bottom:10px}
-
-button{
-  flex:1;
-  padding:12px;
-  border-radius:10px;
-  border:0;
-  cursor:pointer;
-  font-weight:600;
+.card + .card{
+  margin-top:10px;
 }
 
-.primary{background:#60a5fa}
-.dark{background:#1f2937;color:#e5e7eb}
+/* label */
+.lbl{
+  font-size:11px;
+  color:#94a3b8;
+  margin-bottom:6px;
+  letter-spacing:.02em;
+}
 
-.chunk{
+/* value */
+.val{
   font-size:14px;
   color:#cbd5e1;
   line-height:1.6;
 }
 
-.score{
-  font-size:28px;
-  font-weight:800;
+/* tabs */
+.tabs{
+  display:flex;
+  gap:4px;
+  background:#1f2937;
+  padding:3px;
+  border-radius:10px;
+}
+
+.tab{
+  flex:1;
+  padding:7px;
+  border:none;
+  border-radius:8px;
+  background:transparent;
+  color:#94a3b8;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.tab.active{
+  background:#111827;
+  color:#e5e7eb;
+}
+
+/* category buttons */
+.cats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:8px;
+}
+
+.cat-btn{
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:12px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#1f2937;
+  color:#cbd5e1;
+  cursor:pointer;
+}
+
+.cat-btn.active{
+  background:#60a5fa;
+  color:#0b1220;
+  border-color:#60a5fa;
+}
+
+/* buttons */
+.btns{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+button{
+  padding:10px 6px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#1f2937;
+  color:#e5e7eb;
+  font-size:13px;
+  cursor:pointer;
+}
+
+button.primary{
+  background:#60a5fa;
+  color:#0b1220;
+  font-weight:600;
+}
+
+/* score blocks */
+.score-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.dim{
+  background:#1f2937;
+  border-radius:10px;
+  padding:10px;
   text-align:center;
 }
 
-.small{font-size:12px;color:#94a3b8;white-space:pre-line}
+.dim-val{
+  font-size:18px;
+  font-weight:600;
+}
+
+.dim-lbl{
+  font-size:10px;
+  color:#94a3b8;
+}
+
+/* band */
+.band{
+  font-size:32px;
+  font-weight:700;
+  text-align:center;
+}
+
+.band-sub{
+  font-size:12px;
+  color:#94a3b8;
+  text-align:center;
+}
+
+/* chips */
+.chip{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:20px;
+  font-size:11px;
+  margin-right:4px;
+  margin-bottom:4px;
+}
+
+.chip-g{background:#14532d;color:#86efac;}
+.chip-y{background:#78350f;color:#fde68a;}
+.chip-r{background:#7f1d1d;color:#fecaca;}
+
+/* history */
+.hist-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  font-size:12px;
+}
+
+.hist-band{
+  font-size:12px;
+  min-width:36px;
+  text-align:center;
+}
+
+.hist-text{
+  flex:1;
+  color:#cbd5e1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.hist-time{
+  color:#64748b;
+  font-size:11px;
+}
+
+/* progress */
+.progress-bar{
+  height:6px;
+  background:#1f2937;
+  border-radius:3px;
+  overflow:hidden;
+}
+
+.progress-fill{
+  height:100%;
+  background:#60a5fa;
+  width:0%;
+}
+
+/* misc */
+.empty{
+  color:#64748b;
+  text-align:center;
+  padding:10px;
+  font-size:13px;
+}
+
+.hidden{display:none;}
+
+canvas#wave{
+  width:100%;
+  height:60px;
+  display:block;
+}
+
+/* recording dot */
+#rec-dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#ef4444;
+  margin-right:6px;
+  animation:blink 1s infinite;
+}
+
+@keyframes blink{
+  0%,100%{opacity:1}
+  50%{opacity:.2}
+}
 </style>
-</head>
 
-<body>
+<div class="wrap">
 
-<div class="app">
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('practice')">Practice</button>
+  <button class="tab" onclick="switchTab('history')">History</button>
+  <button class="tab" onclick="switchTab('profile')">Profile</button>
+</div>
 
-<h1>🎓 AI Speaking School Engine v4</h1>
+<div id="tab-practice">
+
+<div class="cats" id="cat-btns"></div>
+
+<div class="card">
+  <div class="lbl">Question</div>
+  <div class="val" id="q" style="font-size:15px;font-weight:500">Press Next to begin</div>
+</div>
+
+<div class="card">
+  <div class="lbl">Model answer</div>
+  <div class="val" id="model">—</div>
+</div>
+
+<div class="card">
+  <div class="lbl">Chunk breakdown <span style="font-size:10px;color:var(--color-text-tertiary)">(pause at /)</span></div>
+  <div class="val" id="chunk" style="color:var(--color-text-secondary)">—</div>
+</div>
 
 <div class="btns">
-<button class="primary" onclick="startSpeak()">🎙 Speak</button>
-<button class="dark" onclick="next()">➡ Next</button>
-<button class="dark" onclick="playModel()">🔊 Listen</button>
+  <button class="primary" onclick="startSpeak()" id="speak-btn"><i class="ti ti-microphone"></i> Speak</button>
+  <button onclick="next()"><i class="ti ti-arrow-right"></i> Next</button>
+  <button onclick="playModel()"><i class="ti ti-volume"></i> Listen</button>
+  <button onclick="showHint()" id="hint-btn"><i class="ti ti-bulb"></i> Hint</button>
 </div>
 
-<!-- QUESTION -->
-<div class="card">
-<div class="label">QUESTION</div>
-<div id="q">-</div>
-</div>
-
-<!-- MODEL -->
-<div class="card">
-<div class="label">MODEL ANSWER</div>
-<div id="model">-</div>
-</div>
-
-<!-- CHUNK -->
-<div class="card">
-<div class="label">SPEAKING BREAKDOWN (Chunk Training)</div>
-<div id="chunk" class="chunk">-</div>
-</div>
-
-<!-- USER -->
-<div class="card">
-<div class="label">YOUR ANSWER</div>
-<div id="user">-</div>
-</div>
-
-<!-- SCORE -->
-<div class="card">
-<div class="label">IELTS SCORE</div>
-<div id="score" class="score">-</div>
+<div class="card" id="hint-card" style="display:none">
+  <div class="lbl">Vocabulary hint</div>
+  <div class="val" id="hint-text">—</div>
 </div>
 
 <div class="card">
-  <div class="label">🎧 LIVE WAVEFORM</div>
+  <div class="lbl"><span id="rec-indicator" class="hidden"><span id="rec-dot"></span></span>Your answer</div>
+  <div class="val" id="user">—</div>
+</div>
+
+<div class="card">
+  <div class="lbl">Waveform</div>
   <canvas id="wave"></canvas>
 </div>
 
-<!-- FEEDBACK -->
-<div class="card">
-<div class="label">AI FEEDBACK</div>
-<div id="fb" class="small">-</div>
+<div class="card" id="score-card" style="display:none">
+  <div class="lbl">IELTS band estimate</div>
+  <div class="band" id="band-score">—</div>
+  <div class="band-sub" id="band-level">—</div>
+  <div style="height:10px"></div>
+  <div class="score-row">
+    <div class="dim"><div class="dim-val" id="sc-fluency">—</div><div class="dim-lbl">Fluency</div></div>
+    <div class="dim"><div class="dim-val" id="sc-grammar">—</div><div class="dim-lbl">Grammar</div></div>
+    <div class="dim"><div class="dim-val" id="sc-vocab">—</div><div class="dim-lbl">Vocabulary</div></div>
+    <div class="dim"><div class="dim-val" id="sc-content">—</div><div class="dim-lbl">Content</div></div>
+  </div>
+</div>
+
+<div class="card" id="fb-card" style="display:none">
+  <div class="lbl">AI Feedback</div>
+  <div id="fb-list"></div>
+</div>
+
+</div>
+
+<div id="tab-history" class="hidden">
+  <div class="card">
+    <div class="lbl">Recent sessions</div>
+    <div id="hist-list"><div class="empty">No history yet</div></div>
+  </div>
+</div>
+
+<div id="tab-profile" class="hidden">
+  <div class="card">
+    <div class="lbl">Overall stats</div>
+    <div class="score-row" style="margin-bottom:10px">
+      <div class="dim"><div class="dim-val" id="p-total">0</div><div class="dim-lbl">Attempts</div></div>
+      <div class="dim"><div class="dim-val" id="p-avg">—</div><div class="dim-lbl">Avg band</div></div>
+      <div class="dim"><div class="dim-val" id="p-best">—</div><div class="dim-lbl">Best</div></div>
+      <div class="dim"><div class="dim-val" id="p-streak">0</div><div class="dim-lbl">Streak</div></div>
+    </div>
+    <div class="lbl" style="margin-top:8px">Weakness areas</div>
+    <div id="p-weak" class="val" style="color:var(--color-text-secondary)">Practice more to see insights</div>
+  </div>
+  <div class="card">
+    <div class="lbl">Daily progress</div>
+    <div id="p-daily" class="val">—</div>
+    <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" id="p-bar" style="width:0%"></div></div>
+    <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px" id="p-goal">Goal: 10 attempts per day</div>
+  </div>
+  <div style="text-align:center;margin-top:4px">
+    <button onclick="clearDB()" style="font-size:12px;color:var(--color-text-danger);background:transparent;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 14px;cursor:pointer">Clear all data</button>
+  </div>
 </div>
 
 </div>
 
 <script>
-let audioContext;
-let analyser;
-let microphone;
-let dataArray;
-let canvas;
-let ctx;
-let animationId;
-let streamRef;
-
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const rec = new SpeechRecognition();
-rec.lang="en-US";
-
-const qs=[
-{
-q:"Order coffee",
-model:"I would like a cup of coffee please."
-},
-{
-q:"Introduce yourself",
-model:"My name is John and I am a software engineer."
-},
-{
-q:"Ask direction",
-model:"How can I get to the MRT station?"
-},
-{
-q:"Daily routine",
-model:"I usually wake up at seven in the morning."
-}
+const QS = [
+  {q:"Order coffee",cat:"Daily Life",model:"I would like a large coffee with milk, please.",hint:"would like / large / with milk",vocab:["I'd like","a cup of","please","takeaway"]},
+  {q:"Introduce yourself",cat:"Social",model:"My name is Alex and I work as a software engineer.",hint:"My name is / I work as",vocab:["My name is","I am","I work as","originally from"]},
+  {q:"Ask for directions",cat:"Daily Life",model:"Excuse me, could you tell me how to get to the train station?",hint:"Excuse me / could you tell me / how to get to",vocab:["excuse me","could you","turn left","straight ahead"]},
+  {q:"Describe your daily routine",cat:"Daily Life",model:"I usually wake up at seven and have breakfast before going to work.",hint:"I usually / before going to",vocab:["usually","wake up","have breakfast","commute"]},
+  {q:"Talk about your hometown",cat:"Social",model:"I come from Taipei, which is a vibrant city known for its food and culture.",hint:"I come from / which is / known for",vocab:["vibrant","known for","famous for","located in"]},
+  {q:"Order food at a restaurant",cat:"Daily Life",model:"Could I have the grilled chicken with a side salad, please?",hint:"Could I have / with a side of / please",vocab:["could I have","I'll go for","to start","for the main course"]},
+  {q:"Describe your job",cat:"Work",model:"I work in marketing and my main responsibility is managing social media campaigns.",hint:"I work in / my main responsibility is",vocab:["responsible for","in charge of","manage","coordinate"]},
+  {q:"Talk about a hobby",cat:"Social",model:"In my free time I enjoy hiking because it helps me relax and stay fit.",hint:"In my free time / because it helps me",vocab:["in my free time","I'm passionate about","keeps me","enjoy"]},
+  {q:"Make a complaint politely",cat:"Work",model:"I'm sorry to bother you, but there seems to be an error on my bill.",hint:"I'm sorry to bother you / there seems to be",vocab:["I'm afraid","I'd like to report","it appears that","would it be possible"]},
+  {q:"Describe a recent trip",cat:"Social",model:"Last month I visited Japan and the experience was absolutely incredible.",hint:"Last month / and the experience was",vocab:["last month","I visited","it was","I would recommend"]},
+  {q:"Discuss a problem at work",cat:"Work",model:"We have been facing some challenges with the project deadline and need to find a solution.",hint:"We have been facing / and need to",vocab:["facing challenges","tight deadline","come up with","collaborate"]},
+  {q:"Talk about your health habits",cat:"Health",model:"I try to exercise three times a week and eat a balanced diet to stay healthy.",hint:"I try to / three times a week / to stay healthy",vocab:["try to","at least","balanced diet","maintain"]},
+  {q:"Describe your ideal holiday",cat:"Social",model:"My ideal holiday would be a trip to the countryside where I can disconnect and recharge.",hint:"My ideal / would be / where I can",vocab:["would be","disconnect","recharge","peaceful"]},
+  {q:"Ask for help in a store",cat:"Daily Life",model:"Excuse me, do you have this shirt in a larger size?",hint:"Excuse me / do you have / in a larger size",vocab:["do you have","in stock","available","could you check"]},
+  {q:"Describe the weather today",cat:"Daily Life",model:"It's quite warm and sunny today, which is perfect for outdoor activities.",hint:"It's quite / which is perfect for",vocab:["quite","rather","perfect for","ideal"]},
+  {q:"Talk about a book you read",cat:"Academic",model:"I recently read a fascinating novel about artificial intelligence and its impact on society.",hint:"I recently read / about / and its impact on",vocab:["fascinating","thought-provoking","explores","raises questions about"]},
+  {q:"Describe a challenge you overcame",cat:"Work",model:"A few years ago I struggled with public speaking, but I practised every day and improved significantly.",hint:"A few years ago / but I practised / and improved",vocab:["struggled with","overcame","persevered","significantly"]},
+  {q:"Talk about technology",cat:"Academic",model:"Smartphones have completely transformed the way we communicate and access information.",hint:"have completely transformed / the way we",vocab:["transformed","revolutionised","significantly","access"]},
+  {q:"Describe a person you admire",cat:"Social",model:"I deeply admire my mother because she is hardworking, kind, and always supportive.",hint:"I deeply admire / because / and always",vocab:["admire","inspired by","role model","supportive"]},
+  {q:"Explain your study plan",cat:"Academic",model:"I plan to study English for two hours every evening by watching podcasts and reviewing vocabulary.",hint:"I plan to / every evening / by watching",vocab:["plan to","set aside","review","focus on"]},
+  {q:"Discuss climate change",cat:"Academic",model:"Climate change is one of the most pressing issues of our time and requires immediate global action.",hint:"one of the most pressing / and requires",vocab:["pressing","urgent","immediate","global cooperation"]},
+  {q:"Describe your neighbourhood",cat:"Daily Life",model:"My neighbourhood is quite peaceful and has many parks and cafés within walking distance.",hint:"My neighbourhood is / and has / within walking distance",vocab:["peaceful","convenient","within walking distance","lively"]},
+  {q:"Talk about a skill you want to learn",cat:"Academic",model:"I am keen to learn graphic design because it would open up new creative opportunities for me.",hint:"I am keen to / because it would / for me",vocab:["keen to","eager to","would allow me to","broaden"]},
+  {q:"Respond to a job offer",cat:"Work",model:"Thank you very much for the offer. I am delighted to accept and look forward to joining the team.",hint:"Thank you very much / I am delighted to / look forward to",vocab:["delighted","thrilled","look forward to","joining"]},
+  {q:"Describe a traditional food",cat:"Social",model:"One of our traditional dishes is beef noodle soup, which is slow-cooked with spices and herbs.",hint:"One of our traditional dishes is / which is / with",vocab:["traditional","slow-cooked","made with","typical of"]},
+  {q:"Give your opinion on social media",cat:"Academic",model:"In my opinion, social media has both advantages and disadvantages and we need to use it mindfully.",hint:"In my opinion / has both / and we need to",vocab:["in my opinion","on the one hand","on the other hand","mindfully"]},
+  {q:"Make an appointment",cat:"Work",model:"I would like to schedule a meeting for Tuesday afternoon if that works for you.",hint:"I would like to / for / if that works for you",vocab:["schedule","convenient","would Tuesday","if that suits"]},
+  {q:"Describe a goal you have",cat:"Academic",model:"One of my main goals is to become fluent in English within the next two years.",hint:"One of my main goals is / within the next",vocab:["main goal","aim to","by the end of","fluent"]},
+  {q:"Talk about a movie you liked",cat:"Social",model:"I really enjoyed a recent documentary about ocean life because it was both educational and visually stunning.",hint:"I really enjoyed / because it was both / and",vocab:["enjoyed","thought it was","captivating","recommend"]},
+  {q:"Describe a problem in your city",cat:"Academic",model:"One major issue in my city is traffic congestion, which affects people's daily commutes significantly.",hint:"One major issue is / which affects / significantly",vocab:["major issue","traffic congestion","affects","significantly"]}
 ];
 
-let cur=null;
+const CATS = [...new Set(QS.map(x=>x.cat))];
 
-// 🎯 load question
+let cur = null;
+let activeCat = "All";
+let audioCtx, analyser, mic, animId, streamRef;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec;
+if(SR){ rec = new SR(); rec.lang="en-US"; }
+
+function switchTab(t){
+  ['practice','history','profile'].forEach(id=>{
+    document.getElementById('tab-'+id).classList.toggle('hidden', id!==t);
+  });
+  document.querySelectorAll('.tab').forEach((b,i)=>{
+    b.classList.toggle('active',['practice','history','profile'][i]===t);
+  });
+  if(t==='history') renderHistory();
+  if(t==='profile') renderProfile();
+}
+
+function buildCatBtns(){
+  const el = document.getElementById('cat-btns');
+  ['All',...CATS].forEach(c=>{
+    const b = document.createElement('button');
+    b.className='cat-btn'+(c==='All'?' active':'');
+    b.textContent=c;
+    b.onclick=()=>{
+      activeCat=c;
+      document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      next();
+    };
+    el.appendChild(b);
+  });
+}
+
+function filteredQs(){
+  return activeCat==='All'?QS:QS.filter(x=>x.cat===activeCat);
+}
+
 function next(){
-  cur = qs[Math.floor(Math.random()*qs.length)];
-
-  document.getElementById("q").innerText = cur.q;
-  document.getElementById("model").innerText = cur.model;
-  document.getElementById("user").innerText = "-";
-  document.getElementById("score").innerText = "-";
-  document.getElementById("fb").innerText = "-";
-
-  document.getElementById("chunk").innerText =
-    chunk(cur.model);
+  const pool = filteredQs();
+  cur = pool[Math.floor(Math.random()*pool.length)];
+  document.getElementById('q').textContent=cur.q;
+  document.getElementById('model').textContent=cur.model;
+  document.getElementById('chunk').textContent=makeChunk(cur.model);
+  document.getElementById('user').textContent='—';
+  document.getElementById('hint-card').style.display='none';
+  document.getElementById('score-card').style.display='none';
+  document.getElementById('fb-card').style.display='none';
+  document.getElementById('hint-btn').style.display='';
 }
 
-// 🧠 chunking (teacher style)
-function chunk(text){
-  return text
-    .replace("I would like", "I would like /")
-    .replace("My name is", "My name is /")
-    .replace("please", "/ please")
-    .replace("How can I", "How can I /");
+function makeChunk(text){
+  const words = text.split(' ');
+  let out=[], group=[];
+  const CHUNK=4;
+  words.forEach((w,i)=>{
+    group.push(w);
+    if((i+1)%CHUNK===0 || i===words.length-1){
+      out.push(group.join(' '));
+      group=[];
+    }
+  });
+  return out.join(' / ');
 }
 
-// 🔊 listen model
 function playModel(){
+  if(!cur) return;
   const u = new SpeechSynthesisUtterance(cur.model);
-  u.lang="en-US";
+  u.lang="en-US"; u.rate=0.9;
+  speechSynthesis.cancel();
   speechSynthesis.speak(u);
 }
 
-// 🎙 speak
+function showHint(){
+  if(!cur) return;
+  document.getElementById('hint-card').style.display='';
+  const voc = cur.vocab.map(v=>'<span class="chip chip-g">'+v+'</span>').join('');
+  document.getElementById('hint-text').innerHTML='<div style="margin-bottom:6px;font-size:12px;color:var(--color-text-secondary)">'+cur.hint+'</div>'+voc;
+  document.getElementById('hint-btn').style.display='none';
+}
+
 async function startSpeak(){
-
   if(!cur) next();
-
-  streamRef = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-  initWaveform(streamRef);
-
-  rec.start();
-
-  // ⛔ stop after speech (simple MVP control)
-  setTimeout(()=>{
-    if(streamRef){
-      streamRef.getTracks().forEach(t=>t.stop());
-    }
-
-    cancelAnimationFrame(animationId);
-
-  }, 5000);
+  if(!SR){ alert('Speech recognition not supported in this browser. Try Chrome.'); return; }
+  const btn=document.getElementById('speak-btn');
+  btn.textContent='Recording…';
+  document.getElementById('rec-indicator').classList.remove('hidden');
+  try{
+    streamRef = await navigator.mediaDevices.getUserMedia({audio:true});
+    initWave(streamRef);
+    rec.start();
+    setTimeout(()=>{
+      try{ rec.stop(); }catch(e){}
+      stopMic();
+    }, 6000);
+  }catch(e){
+    btn.innerHTML='<i class="ti ti-microphone"></i> Speak';
+    document.getElementById('rec-indicator').classList.add('hidden');
+    alert('Microphone access denied.');
+  }
 }
 
-// 🧠 scoring engine
-rec.onresult=(e)=>{
-  const text = e.results[0][0].transcript;
-  document.getElementById("user").innerText=text;
+function stopMic(){
+  document.getElementById('speak-btn').innerHTML='<i class="ti ti-microphone"></i> Speak';
+  document.getElementById('rec-indicator').classList.add('hidden');
+  if(streamRef){ streamRef.getTracks().forEach(t=>t.stop()); streamRef=null; }
+  cancelAnimationFrame(animId);
+}
 
-  const result = evaluate(text, cur.model);
+if(rec){
+  rec.onresult=e=>{
+    const text = e.results[0][0].transcript;
+    const conf = e.results[0][0].confidence||0.7;
+    document.getElementById('user').textContent=text;
+    const result = evaluate(text, cur.model, conf);
+    renderScore(result);
+    renderFeedback(text, cur.model, result);
+    saveDB(text, result, cur.q, cur.cat);
+    stopMic();
+  };
+  rec.onerror=()=>{ stopMic(); };
+}
 
-  document.getElementById("score").innerText =
-    result.band + " / 9";
-
-  document.getElementById("fb").innerText =
-    feedback(text, cur.model, result);
-
-  saveDB(text, result);
-};
-
-// 🧠 AI scoring (v4 engine)
-function evaluate(user, model){
-
-  const u=user.toLowerCase().split(" ");
-  const s=model.toLowerCase().split(" ");
-
+function evaluate(user, model, conf){
+  const u=user.toLowerCase().replace(/[^a-z\s]/g,'').split(' ').filter(Boolean);
+  const m=model.toLowerCase().replace(/[^a-z\s]/g,'').split(' ').filter(Boolean);
+  const stopwords=new Set(['a','an','the','to','and','or','but','in','on','at','of','for','is','it','i','my','me','we']);
+  const mKw=m.filter(w=>!stopwords.has(w));
   let match=0;
-  s.forEach(w=>u.includes(w)&&match++);
+  mKw.forEach(w=>{ if(u.some(x=>x===w||x===w+'s'||x===w.replace(/s$/,''))) match++; });
+  const content = mKw.length?match/mKw.length:0;
 
-  const content = match / s.length;
+  const fluency = Math.min(1, u.length/m.length);
 
-  const fluency = u.length >= 6 ? 0.8 : 0.6;
+  const grammarPatterns=[/\bi\b/,/\bmy\b/,/\bi'm\b/,/\bwould\b/,/\bcould\b/,/\bplease\b/,/\bhave\b/,/\bhas\b/,/\bwas\b/,/\bwere\b/,/\bshould\b/,/\bdo\b/,/\bdoes\b/];
+  let gHits=grammarPatterns.filter(p=>p.test(user.toLowerCase())).length;
+  const grammar=Math.min(1, 0.4 + gHits*0.08);
 
-  const grammar =
-    (user.includes("i ") || user.includes("my ")) ? 0.8 : 0.5;
+  const pronunciation = Math.min(1, 0.5 + conf*0.5);
 
-  const pronunciation = 0.7; // proxy (browser limit)
+  const vocab = content*0.8 + (u.length>=m.length?0.2:u.length/m.length*0.2);
 
-  const avg = (content + fluency + grammar + pronunciation) / 4;
-
-  const band = (avg * 9).toFixed(1);
-
-  return {band, content, fluency, grammar, pronunciation};
+  const avg=(content*0.3+fluency*0.25+grammar*0.25+pronunciation*0.2);
+  const band=+(1+avg*8).toFixed(1);
+  return{band,content:+(content*9).toFixed(1),fluency:+(fluency*9).toFixed(1),grammar:+(grammar*9).toFixed(1),vocab:+(vocab*9).toFixed(1),pronunciation:+(pronunciation*9).toFixed(1)};
 }
 
-// 🧠 teacher feedback engine
-function feedback(user, model, r){
-
-  let f=[];
-
-  if(r.band < 5){
-    f.push("🔴 Beginner level");
-    f.push("👉 You are speaking keywords instead of full sentences");
-    f.push("💡 Focus: Subject + Verb + Object");
-  }
-
-  else if(r.band < 7){
-    f.push("🟡 Intermediate level");
-    f.push("👉 Good idea but grammar incomplete");
-    f.push("💡 Add structure: would / can / usually");
-  }
-
-  else{
-    f.push("🟢 Advanced level");
-    f.push("👉 Natural sentence flow");
-    f.push("💡 Improve intonation & politeness");
-  }
-
-  if(!user.includes("please") && model.includes("please")){
-    f.push("🗣 Native tip: add 'please' in polite requests");
-  }
-
-  if(user.split(" ").length < 5){
-    f.push("⚠️ Expand your sentence for fluency");
-  }
-
-  if(user.includes("want coffee")){
-    f.push("💡 More natural: 'I would like a coffee'");
-  }
-
-  return f.join("\n");
+function levelLabel(band){
+  if(band>=8) return'Advanced — native-like fluency';
+  if(band>=7) return'Upper-intermediate — clear and accurate';
+  if(band>=6) return'Intermediate — generally effective';
+  if(band>=5) return'Elementary — limited range';
+  return'Beginner — basic phrases only';
 }
 
-// 📊 localStorage DB
-function saveDB(text, r){
-
-  let db = JSON.parse(localStorage.getItem("speaking_v4")||"[]");
-
-  db.push({
-    time: new Date().toISOString(),
-    text,
-    band: r.band
-  });
-
-  localStorage.setItem("speaking_v4", JSON.stringify(db));
-
-  updateReport();
+function renderScore(r){
+  document.getElementById('score-card').style.display='';
+  document.getElementById('band-score').textContent=r.band+' / 9';
+  document.getElementById('band-level').textContent=levelLabel(r.band);
+  document.getElementById('sc-fluency').textContent=r.fluency;
+  document.getElementById('sc-grammar').textContent=r.grammar;
+  document.getElementById('sc-vocab').textContent=r.vocab;
+  document.getElementById('sc-content').textContent=r.content;
 }
 
-// 🧾 daily report
-function updateReport(){
+function renderFeedback(user, model, r){
+  document.getElementById('fb-card').style.display='';
+  const items=[];
+  if(r.band<5){
+    items.push({t:'Beginner level detected',c:'r'});
+    items.push({t:'Tip: aim for Subject + Verb + Object structure',c:'r'});
+  } else if(r.band<7){
+    items.push({t:'Good effort — grammar could be more precise',c:'y'});
+    items.push({t:'Try using modal verbs: would, could, should',c:'y'});
+  } else {
+    items.push({t:'Excellent — natural sentence flow',c:'g'});
+    items.push({t:'Work on intonation and politeness markers',c:'g'});
+  }
+  if(r.fluency<5) items.push({t:'Expand your answer — more words = more fluency marks',c:'y'});
+  if(r.content<5) items.push({t:'Try to match more of the key vocabulary from the model',c:'y'});
+  if(r.grammar<5) items.push({t:'Include grammar markers: I, my, would, have, was…',c:'r'});
+  if(!user.toLowerCase().includes('please')&&model.toLowerCase().includes('please'))
+    items.push({t:"Native tip: add 'please' in polite requests",c:'g'});
+  const mWords=model.toLowerCase().split(' ');
+  const uWords=user.toLowerCase().split(' ');
+  const missed=mWords.filter(w=>w.length>4&&!uWords.includes(w)).slice(0,3);
+  if(missed.length) items.push({t:'Key words missing: '+missed.join(', '),c:'y'});
 
-  let db = JSON.parse(localStorage.getItem("speaking_v4")||"[]");
-
-  let today = db.filter(x =>
-    x.time.startsWith(new Date().toISOString().slice(0,10))
-  );
-
-  let avg = today.reduce((a,b)=>a+parseFloat(b.band),0) / (today.length||1);
-
-  console.log("Today attempts:", today.length);
-  console.log("Avg band:", avg.toFixed(1));
+  const el=document.getElementById('fb-list');
+  el.innerHTML=items.map(i=>`<div class="fb-item"><span class="chip chip-${i.c}">${i.c==='g'?'Good':i.c==='y'?'Tip':'Focus'}</span>${i.t}</div>`).join('');
 }
 
-async function initWaveform(stream){
-
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-  analyser = audioContext.createAnalyser();
-  analyser.fftSize = 256;
-
-  microphone = audioContext.createMediaStreamSource(stream);
-  microphone.connect(analyser);
-
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-  canvas = document.getElementById("wave");
-  ctx = canvas.getContext("2d");
-
-  drawWave();
+function saveDB(text, r, q, cat){
+  let db=JSON.parse(localStorage.getItem('speaking_v5')||'[]');
+  db.push({time:new Date().toISOString(),text,band:r.band,q,cat,fluency:r.fluency,grammar:r.grammar,vocab:r.vocab,content:r.content});
+  if(db.length>200) db=db.slice(-200);
+  localStorage.setItem('speaking_v5',JSON.stringify(db));
 }
 
-function drawWave(){
+function getDB(){ return JSON.parse(localStorage.getItem('speaking_v5')||'[]'); }
 
-  animationId = requestAnimationFrame(drawWave);
+function clearDB(){
+  if(confirm('Clear all session data?')){ localStorage.removeItem('speaking_v5'); renderProfile(); renderHistory(); }
+}
 
-  analyser.getByteFrequencyData(dataArray);
+function renderHistory(){
+  const db=getDB().slice().reverse();
+  const el=document.getElementById('hist-list');
+  if(!db.length){ el.innerHTML='<div class="empty">No history yet</div>'; return; }
+  el.innerHTML=db.slice(0,30).map(x=>{
+    const d=new Date(x.time);
+    const t=d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const cls=x.band>=7?'chip-g':x.band>=5?'chip-y':'chip-r';
+    return`<div class="hist-row"><span class="hist-band chip ${cls}">${x.band}</span><span class="hist-text">${x.q||''} — ${x.text}</span><span class="hist-time">${t}</span></div>`;
+  }).join('');
+}
 
-  const w = canvas.width = canvas.offsetWidth;
-  const h = canvas.height = 80;
+function renderProfile(){
+  const db=getDB();
+  const total=db.length;
+  const avg=total?+(db.reduce((a,b)=>a+b.band,0)/total).toFixed(1):0;
+  const best=total?Math.max(...db.map(x=>x.band)):0;
+  document.getElementById('p-total').textContent=total;
+  document.getElementById('p-avg').textContent=total?avg:'—';
+  document.getElementById('p-best').textContent=total?best:'—';
 
-  ctx.clearRect(0,0,w,h);
+  const today=new Date().toISOString().slice(0,10);
+  const todayCount=db.filter(x=>x.time.startsWith(today)).length;
+  document.getElementById('p-daily').textContent=todayCount+' attempts today';
+  document.getElementById('p-bar').style.width=Math.min(100,todayCount*10)+'%';
 
-  const barWidth = (w / dataArray.length) * 1.8;
+  const streak=calcStreak(db);
+  document.getElementById('p-streak').textContent=streak;
 
-  let x = 0;
-
-  for(let i=0;i<dataArray.length;i++){
-
-    const v = dataArray[i] / 255;
-    const barHeight = v * h;
-
-    ctx.fillStyle = "#60a5fa";
-
-    ctx.fillRect(x, h - barHeight, barWidth, barHeight);
-
-    x += barWidth + 2;
+  if(total>=3){
+    const dims=['fluency','grammar','vocab','content'];
+    const avgs=dims.map(d=>({d, v:+(db.reduce((a,b)=>a+(b[d]||0),0)/total).toFixed(1)}));
+    avgs.sort((a,b)=>a.v-b.v);
+    const weak=avgs.slice(0,2).map(x=>`${x.d} (${x.v})`).join(', ');
+    document.getElementById('p-weak').textContent='Focus area: '+weak;
   }
 }
 
+function calcStreak(db){
+  if(!db.length) return 0;
+  const days=[...new Set(db.map(x=>x.time.slice(0,10)))].sort().reverse();
+  let streak=0, cur=new Date();
+  for(const d of days){
+    const dt=new Date(d);
+    const diff=Math.round((cur-dt)/864e5);
+    if(diff>1) break;
+    streak++;
+    cur=dt;
+  }
+  return streak;
+}
+
+function initWave(stream){
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  analyser=audioCtx.createAnalyser();
+  analyser.fftSize=256;
+  mic=audioCtx.createMediaStreamSource(stream);
+  mic.connect(analyser);
+  const data=new Uint8Array(analyser.frequencyBinCount);
+  const cv=document.getElementById('wave');
+  const cx=cv.getContext('2d');
+  function draw(){
+    animId=requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(data);
+    const w=cv.width=cv.offsetWidth, h=cv.height=60;
+    cx.clearRect(0,0,w,h);
+    const bw=(w/data.length)*1.8;
+    let x=0;
+    for(let i=0;i<data.length;i++){
+      const bh=(data[i]/255)*h;
+      cx.fillStyle='#378add';
+      cx.fillRect(x,h-bh,bw,bh);
+      x+=bw+1;
+    }
+  }
+  draw();
+}
+
+buildCatBtns();
 next();
-
 </script>
-
-</body>
-</html>
