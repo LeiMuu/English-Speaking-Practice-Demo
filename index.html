@@ -1,4 +1,12 @@
 
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  
 <style>
 *{
   box-sizing:border-box;
@@ -6,15 +14,21 @@
   padding:0;
 }
 
+html{
+  -webkit-text-size-adjust:100%;
+}
+
 body{
   margin:0;
-  font-family:system-ui;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
   background:#0b1220;
   color:#e5e7eb;
+  min-height:100vh;
 }
 
 /* 容器 */
 .wrap{
+  width:100%;
   max-width:520px;
   margin:0 auto;
   padding:16px;
@@ -23,7 +37,7 @@ body{
   gap:10px;
 }
 
-/* 卡片（還原你原本風格） */
+/* 卡片 */
 .card{
   background:#111827;
   padding:12px;
@@ -31,6 +45,7 @@ body{
   border:1px solid rgba(255,255,255,.08);
 }
 
+/* 卡片間距 */
 .card + .card{
   margin-top:10px;
 }
@@ -61,7 +76,7 @@ body{
 
 .tab{
   flex:1;
-  padding:7px;
+  padding:8px;
   border:none;
   border-radius:8px;
   background:transparent;
@@ -107,13 +122,14 @@ body{
 }
 
 button{
-  padding:10px 6px;
+  padding:10px 8px;
   border-radius:10px;
   border:1px solid rgba(255,255,255,.1);
   background:#1f2937;
   color:#e5e7eb;
   font-size:13px;
   cursor:pointer;
+  min-height:44px;
 }
 
 button.primary{
@@ -138,15 +154,16 @@ button.primary{
 
 .dim-val{
   font-size:18px;
-  font-weight:600;
+  font-weight:700;
 }
 
 .dim-lbl{
   font-size:10px;
   color:#94a3b8;
+  margin-top:3px;
 }
 
-/* band */
+/* IELTS band */
 .band{
   font-size:32px;
   font-weight:700;
@@ -157,6 +174,7 @@ button.primary{
   font-size:12px;
   color:#94a3b8;
   text-align:center;
+  line-height:1.5;
 }
 
 /* chips */
@@ -169,23 +187,46 @@ button.primary{
   margin-bottom:4px;
 }
 
-.chip-g{background:#14532d;color:#86efac;}
-.chip-y{background:#78350f;color:#fde68a;}
-.chip-r{background:#7f1d1d;color:#fecaca;}
+.chip-g{
+  background:#14532d;
+  color:#86efac;
+}
+
+.chip-y{
+  background:#78350f;
+  color:#fde68a;
+}
+
+.chip-r{
+  background:#7f1d1d;
+  color:#fecaca;
+}
+
+/* feedback */
+.fb-item{
+  font-size:13px;
+  line-height:1.7;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.fb-item:last-child{
+  border-bottom:none;
+}
 
 /* history */
 .hist-row{
   display:flex;
   align-items:center;
   gap:10px;
-  padding:6px 0;
+  padding:8px 0;
   border-bottom:1px solid rgba(255,255,255,.08);
   font-size:12px;
 }
 
 .hist-band{
   font-size:12px;
-  min-width:36px;
+  min-width:40px;
   text-align:center;
 }
 
@@ -206,7 +247,7 @@ button.primary{
 .progress-bar{
   height:6px;
   background:#1f2937;
-  border-radius:3px;
+  border-radius:999px;
   overflow:hidden;
 }
 
@@ -220,12 +261,15 @@ button.primary{
 .empty{
   color:#64748b;
   text-align:center;
-  padding:10px;
+  padding:12px;
   font-size:13px;
 }
 
-.hidden{display:none;}
+.hidden{
+  display:none;
+}
 
+/* waveform */
 canvas#wave{
   width:100%;
   height:60px;
@@ -247,7 +291,125 @@ canvas#wave{
   0%,100%{opacity:1}
   50%{opacity:.2}
 }
+
+/* =========================
+   Mobile Portrait Optimize
+========================= */
+@media (max-width:768px){
+
+  .wrap{
+    max-width:none;
+    width:100%;
+    padding:14px;
+    gap:12px;
+  }
+
+  body{
+    font-size:16px;
+  }
+
+  .card{
+    padding:16px;
+    border-radius:16px;
+  }
+
+  .card + .card{
+    margin-top:12px;
+  }
+
+  .lbl{
+    font-size:12px;
+  }
+
+  .val{
+    font-size:15px;
+    line-height:1.75;
+  }
+
+  /* Question 放大 */
+  #q{
+    font-size:20px !important;
+    line-height:1.6;
+  }
+
+  /* tabs */
+  .tab{
+    padding:12px 8px;
+    font-size:14px;
+  }
+
+  /* 分類 */
+  .cat-btn{
+    min-height:40px;
+    font-size:13px;
+    padding:8px 14px;
+  }
+
+  /* 按鈕改 2x2 */
+  .btns{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  button{
+    min-height:52px;
+    font-size:15px;
+    font-weight:600;
+  }
+
+  /* score 改 2x2 */
+  .score-row{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .dim{
+    padding:14px;
+  }
+
+  .dim-val{
+    font-size:22px;
+  }
+
+  .dim-lbl{
+    font-size:11px;
+  }
+
+  .band{
+    font-size:42px;
+  }
+
+  .band-sub{
+    font-size:13px;
+  }
+
+  /* history 手機 */
+  .hist-row{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:4px;
+  }
+
+  .hist-text{
+    white-space:normal;
+    overflow:visible;
+    text-overflow:unset;
+  }
+
+  .hist-time{
+    font-size:12px;
+  }
+
+  canvas#wave{
+    height:80px;
+  }
+
+  #tab-profile button{
+    width:100%;
+  }
+}
 </style>
+</head>
 
 <div class="wrap">
 
